@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Flask веб-приложение
+  web:
+    build: .
+    container_name: flask-counter-app
+    ports:
+      - "5000:5000"  # Хост:Контейнер
+    environment:
+      - REDIS_HOST=redis  # Имя сервиса Redis
+      - REDIS_PORT=6379
+      - FLASK_ENV=development
+    depends_on:
+      - redis
+    networks:
+      - app-network
+    volumes:
+      - ./templates:/app/templates  # Для hot-reload шаблонов
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis база данных
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"  # Для доступа с хоста (опционально)
+    command: redis-server --appendonly yes  # Включить persistence
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Определяем тома
+volumes:
+  redis-data:
+    driver: local
+
+# Определяем сеть
+networks:
+  app-network:
+    driver: bridge
