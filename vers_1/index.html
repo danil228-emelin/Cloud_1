@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redis Visit Counter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .counter {
+            font-size: 5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .redis-info {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .refresh-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Redis Visit Counter</h1>
+        
+        <p>This page has been visited:</p>
+        <div class="counter">
+            {{ visits if visits is string else '{:,}'.format(visits) }}
+        </div>
+        <p>time{{ '' if visits == 1 else 's' }}</p>
+        
+        <button class="refresh-btn" onclick="window.location.reload()">
+            🔄 Refresh Counter
+        </button>
+        
+        <div class="redis-info">
+            <h3>📊 Redis Connection Info:</h3>
+            {% if redis_info.connected %}
+                <p><strong>Status:</strong> <span class="status connected">✅ CONNECTED</span></p>
+                <p><strong>Host:</strong> {{ redis_info.host }}</p>
+                <p><strong>Port:</strong> {{ redis_info.port }}</p>
+            {% elif redis_info.error %}
+                <p><strong>Status:</strong> <span class="status disconnected">❌ DISCONNECTED</span></p>
+                <p><strong>Error:</strong> {{ redis_info.error }}</p>
+            {% else %}
+                <p><strong>Status:</strong> <span class="status disconnected">❌ DISCONNECTED</span></p>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>Powered by Flask + Redis + Docker</p>
+            <p>Health check: <a href="/health">/health</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // Авто-обновление каждые 30 секунд (опционально)
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
