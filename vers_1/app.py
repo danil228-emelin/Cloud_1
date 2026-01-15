@@ -2,9 +2,9 @@ from flask import Flask, render_template
 import redis
 import os
 
-app = Flask(__name__)  # Убрали явное указание template_folder
+app = Flask(__name__)  
 
-# Подключение к Redis
+
 redis_host = os.environ.get('REDIS_HOST', 'redis')
 redis_port = int(os.environ.get('REDIS_PORT', 6379))
 
